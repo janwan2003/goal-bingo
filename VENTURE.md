@@ -133,7 +133,7 @@ Verified 2026-11-22:
 - `node --test tests/unit/*.test.js`: 6/6 pass (slot layout covers every row/column/diagonal, lines with free
   centre, text cleaning, idea picking).
 - `tests/e2e/run.mjs` in real Chromium (5 browser contexts, phone 390px and desktop 1280px) **passes locally and
-  on production** (prod run against deploy b682b6f4's predecessor 3e9f6712, same code + verification tag):
+  on production** (last prod run on the final deploy b682b6f4, group 2YYEidEx2PbC, which deleted itself):
   validation, create, write + fill with ideas (19 unique), friend-slot toast, duplicate-name join refused, word
   filter (400), secrets hidden in UI and API (owner and third friend), no hashes/author ids in the API, tick before
   reveal refused (409), non-organiser reveal refused (403), reveal banner + "from Ben", 4 ticks + friend tick →
