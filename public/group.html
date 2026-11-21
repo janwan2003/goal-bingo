@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--META--><title>Goal Bingo</title><!--/META-->
+<meta name="theme-color" content="#5b3df5">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<header class="wrap top">
+  <a class="logo" href="/"><img src="/icon.svg" alt="" width="30" height="30">Goal Bingo</a>
+  <button class="btn small ghost hidden" id="settingsBtn" type="button">Settings</button>
+</header>
+<main class="wrap narrow" id="app">
+  <p class="muted" id="loading">Loading…</p>
+</main>
+<footer class="wrap foot"><div class="row"><span>About: Goal Bingo is a free group goal bingo card maker.</span><span><a href="/">Start your own bingo</a> · <a href="/privacy">Privacy</a></span></div></footer>
+
+<dialog id="sqDlg">
+  <form method="dialog" class="in" id="sqForm">
+    <button class="close" value="cancel" aria-label="Close" type="submit" formnovalidate>×</button>
+    <h2 id="sqTitle">Your square</h2>
+    <p class="muted small" id="sqHint" style="margin:0 0 12px"></p>
+    <div id="sqEdit">
+      <textarea id="sqText" maxlength="60" placeholder="e.g. Run a 5k"></textarea>
+      <div class="chips" id="sqIdeas"></div>
+    </div>
+    <p id="sqShow" style="font-size:20px;font-weight:700;margin:6px 0 14px"></p>
+    <p class="error" id="sqErr" role="alert"></p>
+    <div class="btns" style="margin-top:14px" id="sqBtns"></div>
+  </form>
+</dialog>
+
+<dialog id="cardDlg">
+  <div class="in">
+    <button class="close" aria-label="Close" type="button" id="cardClose">×</button>
+    <h2 id="cardTitle"></h2>
+    <p class="muted small" id="cardSub" style="margin:0 0 12px"></p>
+    <div id="cardBody"></div>
+  </div>
+</dialog>
+
+<dialog id="setDlg">
+  <div class="in">
+    <button class="close" aria-label="Close" type="button" id="setClose">×</button>
+    <h2>Settings</h2>
+    <div id="adminSet">
+      <div class="field" style="margin-top:12px">
+        <label for="setName">Group name</label>
+        <div class="inline" style="display:flex;gap:8px"><input id="setName" type="text" maxlength="60"><button class="btn small" id="setNameBtn" type="button">Save</button></div>
+      </div>
+      <div class="field" id="setRevealBox">
+        <label for="setReveal">Reveal date</label>
+        <div style="display:flex;gap:8px"><input id="setReveal" type="date"><button class="btn small" id="setRevealBtn" type="button">Save</button></div>
+        <button class="btn soft block" id="revealNow" type="button" style="margin-top:10px">Reveal all cards now</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="setMe">Your name</label>
+      <div style="display:flex;gap:8px"><input id="setMe" type="text" maxlength="24"><button class="btn small" id="setMeBtn" type="button">Save</button></div>
+    </div>
+    <div class="field">
+      <label>Use on another device</label>
+      <p class="muted small" style="margin:0 0 8px">Open this personal link on your other phone or laptop. Keep it to yourself: it signs in as you.</p>
+      <button class="btn ghost small" id="copyKey" type="button">Copy my personal link</button>
+    </div>
+    <p class="error" id="setErr" role="alert"></p>
+    <div class="btns" style="margin-top:8px"><button class="btn danger small" id="leaveBtn" type="button">Leave this bingo</button><button class="btn danger small" id="deleteBtn" type="button">Delete this bingo</button></div>
+  </div>
+</dialog>
+<div class="toast" id="toast"></div>
+<script type="module" src="/js/group.js"></script>
+</body>
+</html>

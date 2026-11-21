@@ -1,10 +1,10 @@
 ---
 slug: goal-bingo
-stage: idea
-priority: 3
-url:
-repo:
-updated: 2026-11-21
+stage: launched
+priority: 4
+url: https://pb-goal-bingo.pages.dev
+repo: https://github.com/janwan2003/goal-bingo
+updated: 2026-11-22
 ---
 
 # goal-bingo
@@ -85,6 +85,10 @@ Searches run 2026-11-21. Sources are search-result summaries, not opened pages, 
   players), [Life Bingo](https://apps.apple.com/us/app/id1534186053) (private, $0.99). None we saw has
   friends writing squares on your card.
 - **Gap:** no usage numbers for any of these apps; trend evidence is press coverage, not volume.
+- **Re-check 2026-11-22** (2 web searches, result summaries): Bingo Baker hosts dozens of public "2026 Goals"
+  cards (e.g. [9921058](https://bingobaker.com/view/9921058), [9943654](https://bingobaker.com/view/9943654)),
+  so people do make these online; friend groups make boards together at craft nights (Bustle, Lemon8). No tool
+  found where friends write squares on each other's cards; closest app is Life Bingo (solo). Evidence holds.
 
 ## Our edge
 
@@ -101,19 +105,61 @@ Searches run 2026-11-21. Sources are search-result summaries, not opened pages, 
 
 ## Status
 
-Idea only. Nothing built. Evidence above from web search on 2026-11-21.
+**Live: https://pb-goal-bingo.pages.dev** (brand: **Goal Bingo**). Product + support page:
+https://janwan2003.github.io/goal-bingo/ (privacy policy at /privacy on the live site). Search Console: site
+verified (META), added, sitemap submitted 2026-11-22 (`scripts/gsc.py`).
+
+What exists and works (Cloudflare Pages + Functions; data in a SQLite Durable Object, Worker `pb-goal-bingo-db`,
+because the account's 10 D1 databases are used up; free plan, no build step):
+- Home page aimed at "2027 bingo card with friends": hero with a demo card, create form (group name, your name,
+  card size 5×5 / 4×4 / 3×3, reveal on 1 Jan midnight / a date / "I'll press it"), how it works, FAQ, Summer /
+  Trip / Uni term templates, "Your bingos" list.
+- Group page `/g/<12-char id>`: join with a name (duplicate names refused); "Write on your friends' cards" (one
+  secret square per friend, first come first served into fixed friend slots: one per row and column, 5 on 5×5);
+  your card (tap to write, idea chips, "Fill the rest with ideas"); friend squares hidden (text and author) from
+  everyone but their writer until the reveal, enforced in the API; reveal countdown; organiser "Reveal now".
+- After the reveal: flip animation + banner; tick squares; a friend's square goes to "waiting" until that friend
+  confirms ("Did they really do it?"); lines, BINGO and 👑 first-bingo badges; owner can remove a friend square or
+  fill an empty one; "The race" board with mini cards; full-card dialog; "Save as image" (1080×1350 PNG, Web
+  Share on phones, download on desktop).
+- Link preview per group with live state: "3 players so far: Anna, Ben and Cleo. Make your card and write a
+  secret square on theirs. Cards reveal on 1 January." → "Anna got bingo first! …". Static og.png 1200×630.
+- Joiner → creator: "Start a bingo with another group" with New Year / Summer / Trip / Uni term links that prefill.
+- Per-device token (only SHA-256 stored), personal `#k=` link for a second device, settings (rename group/self,
+  change reveal date, leave, delete), rate limits per hashed IP (create 20/h, join 60/h, writes 900/h), max 30
+  players, small word filter on friend squares, groups idle 500 days deleted, CSP + security headers, /g/ noindex.
+
+Verified 2026-11-22:
+- `node --test tests/unit/*.test.js`: 6/6 pass (slot layout covers every row/column/diagonal, lines with free
+  centre, text cleaning, idea picking).
+- `tests/e2e/run.mjs` in real Chromium (5 browser contexts, phone 390px and desktop 1280px) **passes locally and
+  on production** (prod run against deploy b682b6f4's predecessor 3e9f6712, same code + verification tag):
+  validation, create, write + fill with ideas (19 unique), friend-slot toast, duplicate-name join refused, word
+  filter (400), secrets hidden in UI and API (owner and third friend), no hashes/author ids in the API, tick before
+  reveal refused (409), non-organiser reveal refused (403), reveal banner + "from Ben", 4 ticks + friend tick →
+  waiting, only the writer can confirm (404 for others), confirm → bingo banner "You were first" + FIRST badge,
+  link preview text at 1 player / 3 players / after bingo, card dialog + PNG download (>20 KB), untick clears
+  bingo, personal link on a 2nd device (token stripped from URL), leave removes card and squares, delete → 404,
+  privacy 200, no unexpected console errors. Screenshots checked by eye: home phone + desktop, revealed card
+  phone, group desktop, card image, og.png.
+- Not tested: real iOS Safari / WhatsApp in-app browser, Web Share sheet on a real phone, the 1 January
+  midnight reveal on a real clock (reveal-at-a-time is the same code path as "Reveal now": `reveal_at <= now`).
 
 ## Next steps
 
-1. Decide with the operator whether to ship for 2027 New Year (live by ~2026-12-20) or hold for a
-   "summer bingo" launch.
-2. Design the 1 January reveal, the card image and the live link preview first.
-3. Build on Cloudflare Pages + Functions + D1 (`pb-goal-bingo`): group, cards, squares (owner or
-   friend-written), ticks with witness confirmation, lock/reveal dates; rate limit per IP; dynamic
-   OG image.
-4. Playwright end-to-end test: create → 3 join → wildcards written → reveal date passes → tick +
-   witness → bingo card renders.
-5. Month-1 check-in nudge via the link preview and an opt-in email reminder (email only if asked).
+1. Operator check on a real phone (inbox request 2026-11-22): WhatsApp preview + join inside the in-app browser.
+2. Quality session: check `Save as image` on iOS Safari (canvas fonts, emoji 🎁), accessibility pass (focus
+   order in dialogs), Lighthouse.
+3. SEO before ~20 Dec: a few landing pages that can rank ("2027 bingo card ideas", "bingo card with friends",
+   "summer bingo card"), each ending in the create form; read Search Console impressions weekly.
+4. Monthly nudge: link preview + an in-page "this month" prompt; consider a dynamic per-group OG image.
+5. Record `## Metrics` weekly from the Durable Object (counts of groups, members, ticks; no personal data):
+   add an admin-only count endpoint guarded by a secret.
+
+## Metrics
+
+- 2026-11-22: launched today; 0 real groups (the only groups created were e2e test groups, which delete
+  themselves). Search Console: just verified, no data yet.
 
 ## Monetization plan
 
@@ -124,3 +170,8 @@ can take money.
 
 - 2026-11-21 scout: created from scouting session; evidence from 2 web searches (search-result
   summaries, pages not opened). Not built.
+- 2026-11-21 review: raised p3→p4. New Year goal bingo must be live and indexed before ~26 Dec; build in the next 2 weeks.
+- 2026-11-22 builder: evidence re-checked (2 searches, holds). Built and launched Goal Bingo: Pages + Functions +
+  SQLite Durable Object (D1 limit reached), home/group/privacy pages, card image, live link preview, Search
+  Console verified + sitemap, GitHub repo + Pages product page. Unit 6/6; e2e passes locally and on
+  https://pb-goal-bingo.pages.dev (5 Chromium contexts, phone + desktop). Stage → launched.

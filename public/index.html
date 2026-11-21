@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Goal Bingo: make a 2027 bingo card with your friends</title>
+<meta name="description" content="Free goal bingo card maker for friend groups. Everyone makes a 2027 bingo card, friends secretly write one square on yours, and the cards reveal on 1 January. No app, no sign-up.">
+<link rel="canonical" href="https://pb-goal-bingo.pages.dev/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Goal Bingo">
+<meta property="og:title" content="Goal Bingo: your 2027 bingo card, with friends">
+<meta property="og:description" content="Everyone makes a goal bingo card, friends secretly write one square on yours, and the cards reveal on 1 January.">
+<meta property="og:url" content="https://pb-goal-bingo.pages.dev/">
+<meta property="og:image" content="https://pb-goal-bingo.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="google-site-verification" content="g6R95T8-VFARk0PYhc-lkqete3o5OcxzkrFJ0B-vI4E" />
+<meta name="theme-color" content="#5b3df5">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/app.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Goal Bingo","url":"https://pb-goal-bingo.pages.dev/","applicationCategory":"LifestyleApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Make a goal bingo card with your friends. Friends write a secret square on your card, revealed on 1 January."}</script>
+</head>
+<body>
+<header class="wrap top">
+  <a class="logo" href="/"><img src="/icon.svg" alt="" width="30" height="30">Goal Bingo</a>
+  <a class="btn small soft" href="#start">Start a bingo</a>
+</header>
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1>Your 2027 bingo card, <span class="hl">written with friends</span></h1>
+      <p class="lead">Everyone in the group makes a goal bingo card, and each friend secretly writes one square on yours. The cards reveal at midnight on 1 January. Tick squares all year; first line wins.</p>
+      <div class="btns"><a class="btn" href="#start">Start our bingo</a><a class="btn ghost" href="#how">How it works</a></div>
+      <p class="muted small" style="margin-top:14px">Free. No app, no sign-up: one link in your group chat.</p>
+    </div>
+    <div>
+      <div class="card readonly n5" aria-label="Example bingo card" style="--n:5">
+<div class="cell done"><span class="t">Read 12 books</span></div>
+<div class="cell friend"><span class="t">Visit me in Lisbon</span><span class="by">from Ana</span></div>
+<div class="cell"><span class="t">Run a 5k</span></div>
+<div class="cell done"><span class="t">Learn to make pasta</span></div>
+<div class="cell"><span class="t">Go camping</span></div>
+<div class="cell"><span class="t">Try pottery</span></div>
+<div class="cell done"><span class="t">Watch a sunrise</span></div>
+<div class="cell"><span class="t">Host a dinner party</span></div>
+<div class="cell friend done"><span class="t">Finally book the dentist</span><span class="by">from Ben</span></div>
+<div class="cell"><span class="t">Learn 50 words of Italian</span></div>
+<div class="cell friend"><span class="t">Sing a full karaoke song</span><span class="by">from Cleo</span></div>
+<div class="cell"><span class="t">See a live concert</span></div>
+<div class="cell free done"><span class="t">FREE</span></div>
+<div class="cell"><span class="t">Swim in the sea</span></div>
+<div class="cell"><span class="t">Plant a herb garden</span></div>
+<div class="cell"><span class="t">Write a letter by hand</span></div>
+<div class="cell"><span class="t">Take a dance class</span></div>
+<div class="cell"><span class="t">Bake bread</span></div>
+<div class="cell done"><span class="t">Go stargazing</span></div>
+<div class="cell friend"><span class="t">Beat me at chess</span><span class="by">from Dan</span></div>
+<div class="cell"><span class="t">Road trip</span></div>
+<div class="cell"><span class="t">Climb a mountain</span></div>
+<div class="cell friend"><span class="t">Send me a postcard</span><span class="by">from Eva</span></div>
+<div class="cell"><span class="t">Journal for a month</span></div>
+<div class="cell done"><span class="t">No-phone Sunday</span></div>
+      </div>
+      <div class="card-legend"><span><i style="background:var(--gold-soft);border:1px solid #f0d58b"></i>written by a friend</span><span><i style="background:rgba(255,92,122,.5)"></i>done</span></div>
+    </div>
+  </section>
+
+  <section id="how" style="margin-top:40px">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step"><b>1</b><h3>Start a group</h3><p>Name it, pick a card size and send the link to your group chat.</p></div>
+      <div class="step"><b>2</b><h3>Fill your card</h3><p>Write your goals (or tap ideas). Then write one secret square on each friend’s card.</p></div>
+      <div class="step"><b>3</b><h3>Reveal and race</h3><p>On 1 January every card flips open. A friend confirms when you finish the square they wrote.</p></div>
+    </div>
+  </section>
+
+  <section id="start" class="panel narrow" style="margin:40px auto 0">
+    <h2>Start a bingo</h2>
+    <p class="muted" style="margin-top:0">Takes 20 seconds. You get a link to share.</p>
+    <form id="create" novalidate>
+      <div class="field">
+        <label for="gName">Group name</label>
+        <input id="gName" type="text" maxlength="60" placeholder="Uni friends 2027" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="you">Your name</label>
+        <input id="you" type="text" maxlength="24" placeholder="What your friends call you" autocomplete="given-name">
+      </div>
+      <div class="field">
+        <label>Card size</label>
+        <div class="seg" role="radiogroup">
+          <label><input type="radio" name="size" value="5" checked><span>5 × 5<small>classic</small></span></label>
+          <label><input type="radio" name="size" value="4"><span>4 × 4<small>16 squares</small></span></label>
+          <label><input type="radio" name="size" value="3"><span>3 × 3<small>quick</small></span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Reveal friends’ squares</label>
+        <div class="seg" role="radiogroup">
+          <label><input type="radio" name="reveal" value="ny" checked><span id="nyLabel">1 Jan<small>midnight</small></span></label>
+          <label><input type="radio" name="reveal" value="date"><span>Pick a date<small>any day</small></span></label>
+          <label><input type="radio" name="reveal" value="manual"><span>I’ll press it<small>at a party</small></span></label>
+        </div>
+        <input id="revealDate" type="date" class="hidden" style="margin-top:10px" aria-label="Reveal date">
+      </div>
+      <button class="btn block" type="submit">Create our bingo</button>
+      <p class="error" id="createErr" role="alert"></p>
+    </form>
+    <p class="muted small" style="margin:14px 0 0">Not just New Year:
+      <span class="chips" style="display:inline-flex;margin:0">
+        <button type="button" class="chip" data-tpl="summer">☀️ Summer bingo</button>
+        <button type="button" class="chip" data-tpl="trip">🧳 Trip bingo</button>
+        <button type="button" class="chip" data-tpl="term">🎓 Uni term bingo</button>
+      </span>
+    </p>
+  </section>
+
+  <section id="mine" class="panel narrow hidden" style="margin:16px auto 0">
+    <h2>Your bingos</h2>
+    <div class="mylist" id="mylist"></div>
+  </section>
+
+  <section class="faq narrow" style="margin:48px auto 0">
+    <h2>Questions</h2>
+    <details><summary>What is a goal bingo card?</summary><p>A goal bingo card puts your goals for the year on a bingo grid instead of a list of resolutions. Each time you do one, you cross it off; a full row, column or diagonal is a bingo. A 5 × 5 card has a free square in the middle.</p></details>
+    <details><summary>What do my friends write?</summary><p>Each friend writes one square on your card: a dare, a wish, something they know you keep putting off. You cannot see them until the reveal. When you finish a square a friend wrote, that friend confirms it.</p></details>
+    <details><summary>Do my friends need an app or an account?</summary><p>No. They open the link, type a name and they are in. It works in any phone browser, including inside WhatsApp, Messenger and Instagram.</p></details>
+    <details><summary>Can I use it for things other than New Year?</summary><p>Yes: a summer bingo, a trip bingo, a uni term or a birthday year. Pick any reveal date, or reveal it yourself at a party.</p></details>
+    <details><summary>Is it free?</summary><p>Yes, completely. There are no ads and we do not sell anything.</p></details>
+    <details><summary>Can I share my card?</summary><p>Yes. Save your card as an image sized for stories, with your friends’ squares highlighted.</p></details>
+  </section>
+</main>
+<footer class="wrap foot"><div class="row"><span>About: Goal Bingo is a free group goal bingo card maker.</span><span><a href="/privacy">Privacy</a></span></div></footer>
+<div class="toast" id="toast"></div>
+<script type="module" src="/js/home.js"></script>
+</body>
+</html>
