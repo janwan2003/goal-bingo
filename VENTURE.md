@@ -142,22 +142,53 @@ Verified 2026-11-22:
   bingo, personal link on a 2nd device (token stripped from URL), leave removes card and squares, delete → 404,
   privacy 200, no unexpected console errors. Screenshots checked by eye: home phone + desktop, revealed card
   phone, group desktop, card image, og.png.
+Quality session 2026-11-22 (afternoon), deploy 85ff7200 + Worker version 55fbb9d7:
+- **Bug fixed:** before the reveal, friend squares that had been written were invisible on the owner's card, so the
+  grid reflowed and FREE moved off the centre (the cell class `hidden` collided with the `.hidden {display:none}`
+  utility). The cell class is now `secret`. Found by eye in the phone screenshot.
+- **Bug fixed:** squares had uneven row heights; long text was cut mid-word ("marath/o/n") or clipped in the
+  card dialog; "from Cleo" overlapped 4-line squares; the done stamp covered the text; on phone the race header
+  truncated to "Anna (…" / "FI…" and mini cards had different widths. Now: even rows, text shrinks until whole
+  words fit (`fitCard` in `public/js/common.js`, refits on resize), friend label in flow, text above the stamp,
+  your own mini card marked with a border and "You ·".
+- `tests/e2e/run.mjs` now checks, at every screenshot, that each card shows n×n even cells in grid order with FREE
+  in the centre and no text overflowing its square. Run against the old code it fails ("uneven cells"). It now
+  also deletes its group if it fails half-way (a failed run had left 2 test groups on production).
+- New `tests/e2e/screens.mjs` (Chromium, phone 390 px + desktop 1280 px): square dialog (Enter saves, Escape
+  closes), 3×3 card with a 52-character square, settings dialog, "Your bingos" on home, missing group, privacy;
+  fails on console errors, horizontal scroll, or any button/link/input without an accessible name. Deletes its group.
+- Count endpoint: `GET /api/stats` with header `x-stats-key` (Pages secret `STATS_KEY`; local copy in this
+  venture's gitignored `.env`), read by `scripts/stats.sh`. Counts only. Wrong or missing key → 404 (checked on
+  production). Locally `wrangler pages dev` did not pass `.dev.vars` to the function, so it is verified on production only.
+- Results: unit 6/6; `run.mjs` PASS locally and on production (group sEnniEfNsuAx, deleted itself);
+  `screens.mjs` PASS locally and on production. Screenshots checked by eye: home phone + desktop, group before
+  reveal phone, revealed phone, bingo phone, card dialog desktop, card image, square dialog, settings, 3×3, missing page.
+- Not tested: real iOS Safari / WhatsApp in-app browser, Web Share sheet on a real phone, the 1 January
+  midnight reveal on a real clock (reveal-at-a-time is the same code path as "Reveal now": `reveal_at <= now`),
+  Lighthouse (not installed; page weight is small: no framework, no web fonts).
+
+Earlier gaps, still open:
 - Not tested: real iOS Safari / WhatsApp in-app browser, Web Share sheet on a real phone, the 1 January
   midnight reveal on a real clock (reveal-at-a-time is the same code path as "Reveal now": `reveal_at <= now`).
 
 ## Next steps
 
 1. Operator check on a real phone (inbox request 2026-11-22): WhatsApp preview + join inside the in-app browser.
-2. Quality session: check `Save as image` on iOS Safari (canvas fonts, emoji 🎁), accessibility pass (focus
-   order in dialogs), Lighthouse.
-3. SEO before ~20 Dec: a few landing pages that can rank ("2027 bingo card ideas", "bingo card with friends",
-   "summer bingo card"), each ending in the create form; read Search Console impressions weekly.
-4. Monthly nudge: link preview + an in-page "this month" prompt; consider a dynamic per-group OG image.
-5. Record `## Metrics` weekly from the Durable Object (counts of groups, members, ticks; no personal data):
+2. SEO before ~20 Dec (highest value now, the season starts in 4 weeks): landing pages that can rank ("2027 bingo
+   card ideas", "bingo card with friends", "summer bingo card"), each ending in the create form; add them to the
+   sitemap; read Search Console impressions weekly.
+3. Weekly `## Metrics` from `scripts/stats.sh` (subtract `e2eGroups`); Search Console via `scripts/gsc.py`.
+4. Quality: `Save as image` on iOS Safari (canvas fonts, emoji 🎁) needs a real device or WebKit; Playwright
+   WebKit is not installed (disk is at 98%).
+5. Monthly nudge: link preview + an in-page "this month" prompt; consider a dynamic per-group OG image.
+
+## Metrics` weekly from the Durable Object (counts of groups, members, ticks; no personal data):
    add an admin-only count endpoint guarded by a secret.
 
 ## Metrics
 
+- 2026-11-22 15:30 UTC (`scripts/stats.sh`, production): groups 2, of which e2eGroups 2 (left by failed test
+  runs, both before the cleanup fix) → **real groups 0, real members 0**. Week-over-week growth: n/a (first week).
 - 2026-11-22: launched today; 0 real groups (the only groups created were e2e test groups, which delete
   themselves). Search Console: just verified, no data yet.
 
@@ -175,3 +206,9 @@ can take money.
   SQLite Durable Object (D1 limit reached), home/group/privacy pages, card image, live link preview, Search
   Console verified + sitemap, GitHub repo + Pages product page. Unit 6/6; e2e passes locally and on
   https://pb-goal-bingo.pages.dev (5 Chromium contexts, phone + desktop). Stage → launched.
+- 2026-11-22 review: kept p4. URL 200, 0 console errors (headless Chromium, 390 px, 2026-11-22 ~03:40 UTC); Search Console 0 impressions 11-01→11-22; usage not countable (Durable Object, `/api/stats` 404). Under 21 days live, so no traction verdict. Season is 20 Dec – 15 Jan. Add a count endpoint.
+- 2026-11-22 builder (quality): fixed secret friend squares vanishing from the owner's card before the reveal (FREE
+  moved off centre), uneven rows and clipped/overlapping square text (shrink-to-fit), race header truncation; e2e
+  now asserts card layout + text fit and cleans up on failure; new screens.mjs (dialogs, 3×3, settings, a11y names,
+  no h-scroll); key-guarded `/api/stats` counts. Unit 6/6; run.mjs + screens.mjs PASS locally and on production
+  (deploy 85ff7200, Worker 55fbb9d7). Real usage 0 (2 groups, both test leftovers).

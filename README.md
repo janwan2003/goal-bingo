@@ -20,6 +20,7 @@ npx -y pnpm@9 install
 npx wrangler pages dev --port 18942 --ip 127.0.0.1 --inspector-port 19242 --persist-to .wrangler/state
 node --test tests/unit/*.test.js
 BASE=http://127.0.0.1:18942 node tests/e2e/run.mjs     # real Chromium, 4 people, phone + desktop, screenshots in shots/
+BASE=http://127.0.0.1:18942 node tests/e2e/screens.mjs # dialogs, 3x3, settings, a11y names, phone + desktop
 node tools/render-images.mjs                            # og.png + icons
 ```
 
@@ -30,3 +31,8 @@ set -a; . ../../.env; set +a
 npx wrangler pages deploy --branch main
 BASE=https://pb-goal-bingo.pages.dev SHOTS=shots-prod node tests/e2e/run.mjs   # deletes its own group
 ```
+
+## Metrics
+`scripts/stats.sh` prints aggregate counts from production (`GET /api/stats`, header `x-stats-key`). The key is the
+Pages secret `STATS_KEY`; keep a copy as `STATS_KEY=...` in this directory's `.env` (gitignored). `e2eGroups` counts
+groups left by failed test runs; subtract it.

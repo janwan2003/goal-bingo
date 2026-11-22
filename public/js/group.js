@@ -1,5 +1,5 @@
 import { IDEAS, WILD_IDEAS, pickIdeas, ownCount, MAX_SQUARE } from './bingo.js';
-import { api, loadGroupAuth, saveGroup, forgetGroup, toast, el } from './common.js';
+import { api, loadGroupAuth, saveGroup, forgetGroup, toast, el, fitCard } from './common.js';
 import { cardImage } from './cardimg.js';
 
 const id = location.pathname.split('/')[2] || '';
@@ -78,7 +78,7 @@ function cardEl(card, { mini = false, onCell = null, flip = false } = {}) {
     if (c.kind === 'friend') cls.push('friend');
     if (c.kind === 'free') cls.push('free');
     if (c.kind !== 'free' && !c.filled) cls.push('empty');
-    if (c.hidden) cls.push('hidden');
+    if (c.hidden) cls.push('secret');
     if (c.state === 2) cls.push('done');
     if (c.state === 1) cls.push('waiting');
     if (flip && c.kind === 'friend' && c.filled) cls.push('flip');
@@ -98,6 +98,7 @@ function cardEl(card, { mini = false, onCell = null, flip = false } = {}) {
     if (onCell && c.kind !== 'free') cell.addEventListener('click', () => onCell(c));
     grid.append(cell);
   }
+  if (!mini) fitCard(grid);
   return grid;
 }
 
@@ -299,10 +300,10 @@ function boardEl() {
     const total = V.size * V.size - (V.size === 5 ? 1 : 0);
     const stat = V.revealed ? `${c.done} done · ${plural(c.lines, 'line', 'lines')}` : `${filled} of ${total} squares written`;
     const badge = c.bingoAt ? el('span', { class: c.bingoAt === firstAt ? 'badge first' : 'badge', text: c.bingoAt === firstAt ? '👑 FIRST' : 'BINGO' }) : null;
-    const b = el('button', { class: 'mini', type: 'button', 'data-card': c.id, onclick: () => openCard(c) },
-      el('div', { class: 'who' }, el('span', { text: c.isMe ? `${c.name} (you)` : c.name }), badge),
+    const b = el('button', { class: c.isMe ? 'mini me' : 'mini', type: 'button', 'data-card': c.id, 'aria-label': `${c.isMe ? 'Your card' : `${c.name}’s card`}: ${stat}`, onclick: () => openCard(c) },
+      el('div', { class: 'who' }, el('span', { text: c.name }), badge),
       cardEl(c, { mini: true }),
-      el('p', { class: 'stat', text: stat }));
+      el('p', { class: 'stat', text: c.isMe ? `You · ${stat}` : stat }));
     grid.append(b);
   }
   box.append(grid);

@@ -39,7 +39,39 @@ async function person(label, opts, expected = []) {
   page.on('dialog', (d) => d.accept());
   return { label, ctx, page };
 }
-const shot = (p, name, fullPage = true) => p.screenshot({ path: path.join(SHOTS, name + '.png'), fullPage });
+// Every visible bingo card must show n*n cells laid out as an even n-by-n grid with FREE in the centre (5x5).
+// (A secret friend square once vanished because its class collided with the .hidden utility.)
+async function checkCards(p, where) {
+  await p.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))));
+  const bad = await p.$$eval('.card', (cards) => cards.filter((c) => c.offsetParent).map((card) => {
+    const n = Number(getComputedStyle(card).getPropertyValue('--n')) || 5;
+    const cells = [...card.querySelectorAll(':scope > .cell')];
+    const boxes = cells.map((c) => c.getBoundingClientRect());
+    if (cells.length !== n * n) return `${cells.length} cells, want ${n * n}`;
+    if (boxes.some((b) => b.width < 4 || b.height < 4)) return 'a cell has no size';
+    const hs = boxes.map((b) => b.height), ws = boxes.map((b) => b.width);
+    if (Math.max(...hs) - Math.min(...hs) > 1.5 || Math.max(...ws) - Math.min(...ws) > 1.5) return 'uneven cells';
+    for (let i = 0; i < cells.length; i++) {
+      const r = Math.floor(i / n), col = i % n;
+      if (Math.abs(boxes[i].top - boxes[r * n].top) > 1 || Math.abs(boxes[i].left - boxes[col].left) > 1) return `cell ${i} out of place`;
+    }
+    if (n === 5 && !cells[12].classList.contains('free')) return 'FREE is not in the centre';
+    if (!card.closest('.mini')) {
+      for (const c of cells) {
+        const t = c.querySelector('.t'), cb = c.getBoundingClientRect();
+        if (!t || !t.textContent) continue;
+        const parts = [t, c.querySelector('.by')].filter(Boolean).map((x) => x.getBoundingClientRect());
+        if (t.scrollWidth > t.clientWidth + 1 || parts.some((b) => b.top < cb.top - 1 || b.bottom > cb.bottom + 1)) return `text overflows: "${t.textContent}"`;
+      }
+    }
+    return null;
+  }).filter(Boolean));
+  assert.deepEqual(bad, [], `card layout on ${where}`);
+}
+const shot = async (p, name, fullPage = true) => {
+  await checkCards(p, name);
+  await p.screenshot({ path: path.join(SHOTS, name + '.png'), fullPage });
+};
 const preview = async (gid) => {
   const html = await (await fetch(`${BASE}/g/${gid}`)).text();
   return {
@@ -56,6 +88,7 @@ const apiAs = (page, gid, method, sub, body) =>
   }, [gid, method, sub, body]);
 
 let step = 'start';
+let cleanup = null; // deletes the test group if the run fails half-way, so production keeps no test data
 try {
   // Home page
   step = 'home';
@@ -78,6 +111,7 @@ try {
   await anna.page.click('#create button[type=submit]');
   await anna.page.waitForURL(/\/g\/[A-Za-z0-9]+$/);
   const gid = anna.page.url().split('/g/')[1];
+  cleanup = () => apiAs(anna.page, gid, 'DELETE', '');
   await anna.page.waitForSelector('#mycard');
   assert.equal(await anna.page.textContent('h1'), 'Uni friends 2027');
   assert.match(await anna.page.textContent('.pill'), /when the organiser presses it/);
@@ -158,7 +192,7 @@ try {
   step = 'secrets hidden';
   await anna.page.reload();
   await anna.page.waitForSelector('#mycard');
-  assert.equal(await anna.page.$$eval('#mycard .cell.friend.hidden', (e) => e.length), 2);
+  assert.equal(await anna.page.$$eval('#mycard .cell.friend.secret', (e) => e.length), 2);
   const annaApi = (await apiAs(anna.page, gid, 'GET', '')).text;
   assert.ok(!annaApi.includes('Visit me in Lisbon') && !annaApi.includes('Sing a full karaoke song'), 'friend squares hidden from the owner');
   assert.ok(!/token_hash|admin_hash|author_id/.test(annaApi), 'no hashes or author ids in the API');
@@ -258,7 +292,7 @@ try {
   await ben2.page.goto(`${BASE}/g/${gid}#k=${benToken}`);
   await ben2.page.waitForSelector('#mycard');
   assert.ok(!ben2.page.url().includes('#k='), 'token stripped from the address bar');
-  assert.match(await ben2.page.textContent('#board'), /Ben \(you\)/);
+  assert.match(await ben2.page.textContent('#board .mini.me'), /^Ben.*You · /);
 
   // Cleo leaves: her card and her squares go
   step = 'leave';
@@ -295,5 +329,6 @@ try {
   if (errors.length) console.error('console errors:', errors);
   process.exitCode = 1;
 } finally {
+  if (process.exitCode && cleanup) console.error('cleanup: DELETE ->', (await cleanup().catch((e) => ({ status: e.message }))).status);
   await browser.close();
 }

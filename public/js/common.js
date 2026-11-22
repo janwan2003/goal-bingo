@@ -63,3 +63,37 @@ export function el(tag, attrs = {}, ...kids) {
   for (const kid of kids.flat()) if (kid !== null && kid !== undefined && kid !== false) e.append(kid);
   return e;
 }
+
+// Shrinks each square's text until whole words fit inside it (squares are fixed-size, text length varies).
+// A ResizeObserver refits a card whenever it changes size, including when it first appears inside a dialog.
+function fitCell(cell) {
+  const t = cell.querySelector('.t');
+  if (!t || !t.textContent) return;
+  cell.style.fontSize = '';
+  cell.classList.remove('squeeze');
+  const cs = getComputedStyle(cell);
+  const base = parseFloat(cs.fontSize);
+  const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+  const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+  const by = cell.querySelector('.by');
+  const fits = () => {
+    const h = cell.clientHeight - padY - (by ? by.offsetHeight + 1 : 0);
+    return t.scrollHeight <= h + 0.5 && t.scrollWidth <= cell.clientWidth - padX + 0.5;
+  };
+  if (fits()) return;
+  let lo = 7, hi = base;
+  for (let i = 0; i < 7; i++) {
+    const mid = (lo + hi) / 2;
+    cell.style.fontSize = mid + 'px';
+    if (fits()) lo = mid; else hi = mid;
+  }
+  cell.style.fontSize = lo + 'px';
+  if (!fits()) cell.classList.add('squeeze');
+}
+const fitObserver = typeof ResizeObserver === 'function'
+  ? new ResizeObserver((entries) => { for (const e of entries) e.target.querySelectorAll('.cell').forEach(fitCell); })
+  : null;
+export function fitCard(card) {
+  if (fitObserver) fitObserver.observe(card);
+  else requestAnimationFrame(() => card.querySelectorAll('.cell').forEach(fitCell));
+}

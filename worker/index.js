@@ -60,7 +60,29 @@ export class GoalBingoDB extends DurableObject {
       const out = await preview(this.env, decodeURIComponent(url.pathname.slice('/__preview/'.length)));
       return new Response(JSON.stringify(out), { headers: { 'content-type': 'application/json' } });
     }
+    if (url.pathname === '/__stats') return new Response(JSON.stringify(this.stats()), { headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
     return handle(request, this.env);
+  }
+  // Counts only. "Creators" = groups (each group has one creator); "joiners" = members who did not create.
+  stats() {
+    const sql = this.ctx.storage.sql;
+    const one = (q, ...a) => sql.exec(q, ...a).toArray()[0].n;
+    const t = Math.floor(Date.now() / 1000);
+    const wk = t - 7 * 86400;
+    return {
+      at: new Date(t * 1000).toISOString(),
+      groups: one('SELECT COUNT(*) n FROM groups'),
+      // Leftovers of failed test runs (tests/e2e/run.mjs uses exactly these names); subtract them from real usage.
+      e2eGroups: one("SELECT COUNT(*) n FROM (SELECT group_id FROM members GROUP BY group_id HAVING SUM(name NOT IN ('Anna', 'Ben', 'Cleo')) = 0)"),
+      members: one('SELECT COUNT(*) n FROM members'),
+      groupsWith2Plus: one('SELECT COUNT(*) n FROM (SELECT group_id FROM members GROUP BY group_id HAVING COUNT(*) >= 2)'),
+      newGroups7d: one('SELECT COUNT(*) n FROM groups WHERE created_at >= ?', wk),
+      newMembers7d: one('SELECT COUNT(*) n FROM members WHERE created_at >= ?', wk),
+      activeGroups7d: one('SELECT COUNT(*) n FROM groups WHERE last_active >= ?', wk),
+      friendSquares: one('SELECT COUNT(*) n FROM squares WHERE author_id <> owner_id'),
+      ticksDone: one('SELECT COUNT(*) n FROM squares WHERE state = 2'),
+      bingos: one('SELECT COUNT(*) n FROM members WHERE bingo_at IS NOT NULL'),
+    };
   }
 }
 

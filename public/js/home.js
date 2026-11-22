@@ -1,5 +1,7 @@
 import { TEMPLATES } from './bingo.js';
-import { api, saveGroup, listGroups, toast } from './common.js';
+import { api, saveGroup, listGroups, toast, fitCard } from './common.js';
+
+document.querySelectorAll('.card').forEach(fitCard);
 
 const $ = (s) => document.querySelector(s);
 const nextYear = new Date().getMonth() >= 6 ? new Date().getFullYear() + 1 : new Date().getFullYear() + (new Date().getMonth() === 0 && new Date().getDate() < 15 ? 0 : 1);
